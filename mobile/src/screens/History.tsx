@@ -63,13 +63,6 @@ const styles = StyleSheet.create({
   },
   wrapperIcon: {
     backgroundColor: 'transparent',
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#7A838B',
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 26,
   },
   title: {
