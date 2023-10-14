@@ -4,7 +4,7 @@
 #ifndef LIB_KEYPAD_INCLUDE_KEYPAD_H_
 #define LIB_KEYPAD_INCLUDE_KEYPAD_H_
 
-#include <matrix_keypad.h>
+#include "matrix_keypad.h"
 
 namespace shub {
 

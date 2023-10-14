@@ -1,7 +1,7 @@
 // Copyright (c) 2023 SecureHub
 // All rights reserved
 
-#include <keypad.h>
+#include "keypad.h"
 
 shub::Keypad::Keypad(MatrixKeypad const&& keypad) :
       keypad_(keypad) {}
