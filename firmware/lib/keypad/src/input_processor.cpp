@@ -1,18 +1,14 @@
 // Copyright (c) 2023 SecureHub
 // All rights reserved
 
-#include "input_manager.h"
+#include "input_processor.h"
 
-enum InputAction : char {
-  kDone = 'A',
-  kRemove = 'B',
-  kClear = 'C'
-};
+#include "keypad.h"
 
-shub::InputManager::InputManager(size_t max_input_size) :
+shub::InputProcessor::InputProcessor(size_t max_input_size) :
       max_input_size_(max_input_size) {}
 
-shub::InputReady shub::InputManager::ProcessData() {
+shub::InputReady shub::InputProcessor::ProcessData() {
   while(!input_queue_.empty()) {
     char data = input_queue_.front();
     input_queue_.pop();
@@ -23,15 +19,21 @@ shub::InputReady shub::InputManager::ProcessData() {
   return false;
 }
 
-void shub::InputManager::PushData(char data) {
+void shub::InputProcessor::PushData(char data) {
   input_queue_.push(data);
 }
 
-std::string const& shub::InputManager::GetInputData() const {
+std::string shub::InputProcessor::ExtractData() {
+  std::string input_data = input_data_;
+  input_data_.clear();
+  return input_data;
+}
+
+std::string const& shub::InputProcessor::GetInputData() const {
   return input_data_;
 }
 
-shub::InputReady shub::InputManager::ProcessData(char data) {
+shub::InputReady shub::InputProcessor::ProcessData(char data) {
   switch(data) {
     default:
       if(input_data_.size() <= max_input_size_) {
@@ -39,17 +41,17 @@ shub::InputReady shub::InputManager::ProcessData(char data) {
       }
       break;
 
-    case InputAction::kRemove:
+    case FunctionKey::kRemove:
       if(!input_data_.empty()) {
         input_data_.pop_back();
       }
       break;
 
-    case InputAction::kClear:
+    case FunctionKey::kClear:
       input_data_.clear();
       break;
 
-    case InputAction::kDone:
+    case FunctionKey::kDone:
       input_queue_ = {};
       return true;
   }
@@ -57,6 +59,6 @@ shub::InputReady shub::InputManager::ProcessData(char data) {
   return false;
 }
 
-bool shub::InputManager::IsQueueEmpty() const {
-  return input_queue_.empty();
+bool shub::InputProcessor::IsPending() const {
+  return !input_queue_.empty();
 }

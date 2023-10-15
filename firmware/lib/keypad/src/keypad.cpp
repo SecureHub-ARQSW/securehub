@@ -31,6 +31,14 @@ shub::pin_t shub::Keypad::GetColumm(uint8_t col) const {
   return keypad_.GetColumm(col);
 }
 
+bool shub::Keypad::IsKeyValid(char key) {
+  return (key != kKeyNotPressed);
+}
+
+bool shub::Keypad::IsFunctionKey(char key) {
+  return (key >= FunctionKey::kDone) && (key <= FunctionKey::kClear);
+}
+
 char shub::Keypad::CheckColumm(uint8_t col) const {
   char key = kKeyNotPressed;
   for(int row = 0; row < 4; row++) {

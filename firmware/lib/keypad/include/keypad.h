@@ -8,6 +8,12 @@
 
 namespace shub {
 
+enum FunctionKey : char {
+  kDone = 'A',
+  kRemove = 'B',
+  kClear = 'C'
+};
+
 class Keypad {
 public:
   explicit Keypad(MatrixKeypad const&& keypad);
@@ -19,6 +25,11 @@ public:
   char CheckPressedButton() const;
 
   pin_t GetColumm(uint8_t col) const;
+
+public:
+  static bool IsKeyValid(char key);
+
+  static bool IsFunctionKey(char key);
 
 public:
   static constexpr char kKeyNotPressed = -1;

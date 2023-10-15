@@ -1,8 +1,8 @@
 // Copyright (c) 2023 SecureHub
 // All rights reserved
 
-#ifndef LIB_INPUT_MANAGER_INCLUDE_INPUT_MANAGER_H_
-#define LIB_INPUT_MANAGER_INCLUDE_INPUT_MANAGER_H_
+#ifndef LIB_INPUT_PROCESSOR_INCLUDE_INPUT_PROCESSOR_H_
+#define LIB_INPUT_PROCESSOR_INCLUDE_INPUT_PROCESSOR_H_
 
 #include <queue>
 #include <string>
@@ -11,18 +11,20 @@ namespace shub {
     
 using InputReady = bool;
 
-class InputManager {
+class InputProcessor {
 public:
-  explicit InputManager(size_t max_input_size);
-  virtual ~InputManager() = default;
+  explicit InputProcessor(size_t max_input_size);
+  virtual ~InputProcessor() = default;
 
   InputReady ProcessData();
 
   void PushData(char data);
 
+  std::string ExtractData();
+
   std::string const& GetInputData() const;
 
-  bool IsQueueEmpty() const;
+  bool IsPending() const;
 
 private:
   InputReady ProcessData(char data);
@@ -35,4 +37,4 @@ private:
 
 }  // namespace shub
 
-#endif  // LIB_INPUT_MANAGER_INCLUDE_INPUT_MANAGER_H_
+#endif  // LIB_INPUT_PROCESSOR_INCLUDE_INPUT_PROCESSOR_H_
