@@ -24,6 +24,8 @@ public:
 
   std::string const& GetInputData() const;
 
+  char GetLastInput() const;
+
   bool IsPending() const;
 
 private:

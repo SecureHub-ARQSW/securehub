@@ -9,14 +9,12 @@ shub::InputProcessor::InputProcessor(size_t max_input_size) :
       max_input_size_(max_input_size) {}
 
 shub::InputReady shub::InputProcessor::ProcessData() {
-  while(!input_queue_.empty()) {
-    char data = input_queue_.front();
-    input_queue_.pop();
-    if(ProcessData(data)) {
-      return true;
-    }
+  if(input_queue_.empty()) {
+    return false;
   }
-  return false;
+  char data = input_queue_.front();
+  input_queue_.pop();
+  return ProcessData(data);
 }
 
 void shub::InputProcessor::PushData(char data) {
@@ -31,6 +29,10 @@ std::string shub::InputProcessor::ExtractData() {
 
 std::string const& shub::InputProcessor::GetInputData() const {
   return input_data_;
+}
+
+char shub::InputProcessor::GetLastInput() const {
+  return input_queue_.back();
 }
 
 shub::InputReady shub::InputProcessor::ProcessData(char data) {
