@@ -10,16 +10,19 @@
 #include "input_processor.h"
 #include "password_manager.h"
 #include "buzzer_manager.h"
+#include "display_manager.h"
 
 shub::Keypad keypad(shub::MatrixKeypad({13, 12, 14, 27}, {26, 25, 33, 32}));
 shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
+shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
 
 void KeypadHandleInput(uint8_t col);
 
 void setup() {
   Serial.begin(115200);
+  display_manager.TurnOn();
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
     KeypadHandleInput(0);
@@ -42,18 +45,35 @@ void loop() {
   buzzer_manager.PlayLoadedSequence();
 
   if(input_processor.IsPending()) {
+
+    if(display_manager.GetNumberAsterisks() == 0) {
+      display_manager.ShowMainScreen();
+    }
+
+    if(input_processor.GetLastInput() == shub::FunctionKey::kClear) {
+      display_manager.ClearAsterisks();
+      display_manager.ShowMainScreen();
+    }
+    else if(input_processor.GetLastInput() == shub::FunctionKey::kRemove) {
+      display_manager.RemoveAsterisk();
+    }
+    else if(input_processor.GetLastInput() != shub::FunctionKey::kDone) {
+      display_manager.AddAsterisk();
+    }
+
     shub::InputReady is_input_ready = input_processor.ProcessData();
-    Serial.printf("CURRENT DATA: %s\n", input_processor.GetInputData().c_str());
-    if(is_input_ready) {
+
+    if(is_input_ready && !input_processor.GetInputData().empty()) {
       std::string password_input = input_processor.ExtractData();
       bool is_correct_password = password_manager.TestPassword(password_input);
       if(is_correct_password) {
         buzzer_manager.PlaySuccessSequence();
-        Serial.printf("CONFIRMED!!!\n");
+        display_manager.ShowSuccessMessage();
       } else {
         buzzer_manager.PlayFailureSequence();
-        Serial.printf("NEGATED!!!\n");
+        display_manager.ShowFailureMessage();
       }
+      display_manager.ClearAsterisks();
     }
   }
 }
