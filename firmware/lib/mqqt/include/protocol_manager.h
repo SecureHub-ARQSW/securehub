@@ -13,17 +13,16 @@ namespace shub {
 
 class ProtocolManager {
  public:
-  ProtocolManager(std::string const& ssid, std::string const& password,
-    std::string const& mqtt_broker, uint8_t mqtt_port,
-    std::string const& mqtt_user, std::string const& device_token,
-    std::string const& device_name);
+  ProtocolManager(std::string const& ssid, std::string const& password);
   
   virtual ~ProtocolManager() = default;
 
   bool ConnectToWifi();
   void VerifyWifiConnection();
   void PrintIpAddress();
-  void ConnectToMqtt();
+  void ConnectToMqtt(std::string const& mqtt_broker, int mqtt_port,
+    std::string const& mqtt_user, std::string const& device_token,
+    std::string const& device_name);
   std::string SerializeJson(std::string const& variable_name, double value);
   std::string SerializeJson(std::string const& variable_name, double value, std::string const& unit);
   void PublishMessage(std::string const& topic, int value);
@@ -31,11 +30,11 @@ class ProtocolManager {
  public:
   std::string ssid_;
   std::string password_;
-  std::string mqtt_broker_;
-  uint8_t mqtt_port_;
-  std::string mqtt_user_;
-  std::string device_token_;
-  std::string device_name_;
+  // std::string mqtt_broker_;
+  // uint8_t mqtt_port_;
+  // std::string mqtt_user_;
+  // std::string device_token_;
+  // std::string device_name_;
 
  private:
   WiFiClientSecure wifi_client_;
