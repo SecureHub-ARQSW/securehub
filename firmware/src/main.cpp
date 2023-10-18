@@ -9,6 +9,7 @@
 #include "keypad.h"
 #include "input_processor.h"
 #include "password_manager.h"
+#include "protocol_manager.h"
 #include "buzzer_manager.h"
 #include "display_manager.h"
 
@@ -17,12 +18,15 @@ shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
-
+shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400", "mqtt.tago.io", 8883, "Default", "token", "ESP32-SHUB");
 void KeypadHandleInput(uint8_t col);
 
 void setup() {
   Serial.begin(115200);
   display_manager.TurnOn();
+  Serial.println("Starting...");
+
+  protocol_manager.ConnectToWifi();
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
     KeypadHandleInput(0);
