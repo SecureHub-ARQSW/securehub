@@ -4,23 +4,22 @@
 #include <queue>
 
 #include <Arduino.h>
-#include <EspMQTTClient.h>
 
-#include "keypad.h"
 #include "input_processor.h"
+#include "keypad.h"
 #include "password_manager.h"
 #include "protocol_manager.h"
 #include "buzzer_manager.h"
 #include "display_manager.h"
+
 
 shub::Keypad keypad(shub::MatrixKeypad({13, 12, 14, 27}, {26, 25, 33, 32}));
 shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
-// shub::ProtocolManager protocol_manager("Lost", "samuel1234");
-shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
-//"mqtt.tago.io", 8883, "Default", "token", "ESP32-SHUB"
+shub::ProtocolManager protocol_manager("Lost", "samuel1234");
+// shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 void KeypadHandleInput(uint8_t col);
 
 void setup() {
@@ -29,7 +28,7 @@ void setup() {
   Serial.println("Starting...");
 
   protocol_manager.ConnectToWifi();
-  protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "35a01a75-6c84-4092-969b-32770bbf1c67", "ESP32-SHUB");
+  protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "0b85a2cd-8762-4c97-a960-35c34f7bb9c0", "ESP32-SHUB");
   Serial.printf("Payload: \n%s\n", protocol_manager.SerializeJson("temperature", 25.6, "ºC").c_str());
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
