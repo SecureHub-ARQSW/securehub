@@ -18,7 +18,8 @@ shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
-shub::ProtocolManager protocol_manager("Lost", "samuel1234");
+// shub::ProtocolManager protocol_manager("Lost", "samuel1234");
+shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 //"mqtt.tago.io", 8883, "Default", "token", "ESP32-SHUB"
 void KeypadHandleInput(uint8_t col);
 
@@ -28,7 +29,8 @@ void setup() {
   Serial.println("Starting...");
 
   protocol_manager.ConnectToWifi();
-  protocol_manager.ConnectToMqtt("mqtt.tago.io", 8883, "Default", "35a01a75-6c84-4092-969b-32770bbf1c67", "ESP32-SHUB");
+  protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "35a01a75-6c84-4092-969b-32770bbf1c67", "ESP32-SHUB");
+  Serial.printf("Payload: \n%s\n", protocol_manager.SerializeJson("temperature", 25.6, "ºC").c_str());
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
     KeypadHandleInput(0);
@@ -82,6 +84,12 @@ void loop() {
       display_manager.ClearAsterisks();
     }
   }
+
+  protocol_manager.VerifyWifiConnection();
+  protocol_manager.ClientLoop();
+  delay(1000);
+  protocol_manager.PublishMessage("info/temperature", protocol_manager.SerializeJson("temperature", 25.6, "ºC"));
+  protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 }
 
 void KeypadHandleInput(uint8_t col) {

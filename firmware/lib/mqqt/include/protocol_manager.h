@@ -7,7 +7,6 @@
 #include <PubSubClient.h>
 #include <string>
 #include <WiFi.h>
-#include <WiFiClientSecure.h>
 
 namespace shub {
 
@@ -25,19 +24,15 @@ class ProtocolManager {
     std::string const& device_name);
   std::string SerializeJson(std::string const& variable_name, double value);
   std::string SerializeJson(std::string const& variable_name, double value, std::string const& unit);
-  void PublishMessage(std::string const& topic, int value);
+  void PublishMessage(std::string const& topic, std::string const& payload);
+  void ClientLoop() { mqtt_client_.loop(); };
 
  public:
   std::string ssid_;
   std::string password_;
-  // std::string mqtt_broker_;
-  // uint8_t mqtt_port_;
-  // std::string mqtt_user_;
-  // std::string device_token_;
-  // std::string device_name_;
 
  private:
-  WiFiClientSecure wifi_client_;
+  WiFiClient wifi_client_;
   PubSubClient mqtt_client_;
 
 };

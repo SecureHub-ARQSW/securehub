@@ -45,8 +45,6 @@ void shub::ProtocolManager::ConnectToMqtt(std::string const& mqtt_broker, int mq
     std::string const& mqtt_user, std::string const& device_token,
     std::string const& device_name) {
 
-    wifi_client_.setInsecure();
-
     if(!mqtt_client_.connected()) {
         Serial.println("MQTT   : Not connected to MQTT broker");
 
@@ -63,5 +61,29 @@ void shub::ProtocolManager::ConnectToMqtt(std::string const& mqtt_broker, int mq
             delay(5000);
             ConnectToWifi();
         }
+    }
+}
+
+std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value, std::string const& unit) {
+    StaticJsonDocument<200> doc;
+    doc["variable"] = variable_name;
+    doc["value"] = value;
+    if(unit != "") {
+        doc["unit"] = unit;
+    }
+    std::string output;
+    serializeJson(doc, output);
+    return output;
+}
+
+std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value) {
+    return SerializeJson(variable_name, value, "");
+}
+
+void shub::ProtocolManager::PublishMessage(std::string const& topic, std::string const& payload) {
+    if(mqtt_client_.publish(topic.c_str(), payload.c_str())) {
+        Serial.printf("MQTT   : Published message to topic %s\n", topic.c_str());
+    } else {
+        Serial.printf("MQTT   : Failed to publish message to topic %s\n", topic.c_str());
     }
 }
