@@ -9,10 +9,12 @@
 #include "keypad.h"
 #include "input_processor.h"
 #include "password_manager.h"
+#include "buzzer_manager.h"
 
 shub::Keypad keypad(shub::MatrixKeypad({13, 12, 14, 27}, {26, 25, 33, 32}));
 shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
+shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 
 void KeypadHandleInput(uint8_t col);
 
@@ -37,6 +39,8 @@ void setup() {
 }
 
 void loop() {
+  buzzer_manager.PlayLoadedSequence();
+
   if(input_processor.IsPending()) {
     shub::InputReady is_input_ready = input_processor.ProcessData();
     Serial.printf("CURRENT DATA: %s\n", input_processor.GetInputData().c_str());
@@ -44,8 +48,10 @@ void loop() {
       std::string password_input = input_processor.ExtractData();
       bool is_correct_password = password_manager.TestPassword(password_input);
       if(is_correct_password) {
+        buzzer_manager.PlaySuccessSequence();
         Serial.printf("CONFIRMED!!!\n");
       } else {
+        buzzer_manager.PlayFailureSequence();
         Serial.printf("NEGATED!!!\n");
       }
     }
@@ -55,6 +61,9 @@ void loop() {
 void KeypadHandleInput(uint8_t col) {
   char pressed_key = keypad.CheckPressedButton(col);
   if(shub::Keypad::IsKeyValid(pressed_key)) {
+    if(pressed_key != shub::FunctionKey::kDone) {
+      buzzer_manager.LoadInputSequence();
+    }
     input_processor.PushData(pressed_key);
   }
 }
