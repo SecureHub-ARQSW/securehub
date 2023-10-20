@@ -16,6 +16,15 @@ bool shub::ProtocolManager::ConnectToWifi() {
     Serial.printf("WiFi   : Connecting to %s\n", ssid_.c_str());
     WiFi.mode(WIFI_STA);  
     WiFi.begin(ssid_.c_str(), password_.c_str());
+    TryConnection();
+    Serial.println("");
+    PrintIpAddress();
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
+    return true;
+}
+
+void shub::ProtocolManager::TryConnection() {
     int counter = 0;
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -25,11 +34,6 @@ bool shub::ProtocolManager::ConnectToWifi() {
             ESP.restart();
         }
     }
-    Serial.println("");
-    PrintIpAddress();
-    WiFi.setAutoReconnect(true);
-    WiFi.persistent(true);
-    return true;
 }
 
 void shub::ProtocolManager::VerifyWifiConnection() {
@@ -64,7 +68,7 @@ void shub::ProtocolManager::ConnectToMqtt(std::string const& mqtt_broker, int mq
     }
 }
 
-std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value, std::string const& unit) {
+std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value, std::string const& unit="") {
     StaticJsonDocument<200> doc;
     doc["variable"] = variable_name;
     doc["value"] = value;
@@ -74,10 +78,6 @@ std::string shub::ProtocolManager::SerializeJson(std::string const& variable_nam
     std::string output;
     serializeJson(doc, output);
     return output;
-}
-
-std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value) {
-    return SerializeJson(variable_name, value, "");
 }
 
 void shub::ProtocolManager::PublishMessage(std::string const& topic, std::string const& payload) {

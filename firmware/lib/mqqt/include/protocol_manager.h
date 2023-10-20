@@ -22,12 +22,17 @@ class ProtocolManager {
   void ConnectToMqtt(std::string const& mqtt_broker, int mqtt_port,
     std::string const& mqtt_user, std::string const& device_token,
     std::string const& device_name);
-  std::string SerializeJson(std::string const& variable_name, double value);
-  std::string SerializeJson(std::string const& variable_name, double value, std::string const& unit);
+  std::string SerializeJson(std::string const& variable_name, double value, std::string const& unit="");
   void PublishMessage(std::string const& topic, std::string const& payload);
   void ClientLoop() { mqtt_client_.loop(); };
 
- public:
+  std::string GetSsid() const { return ssid_; };
+  std::string GetPassword() const { return password_; };
+
+ private:
+  void TryConnection();
+
+ private:
   std::string ssid_;
   std::string password_;
 
