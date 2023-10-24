@@ -18,7 +18,7 @@ shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
-shub::SensorManager sensor_manager(shub::SensorTemperature(4));
+shub::SensorManager sensor_manager(shub::TemperatureSensor(4));
 shub::ProtocolManager protocol_manager("Lost", "samuel1234");
 // shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 void KeypadHandleInput(uint8_t col);
