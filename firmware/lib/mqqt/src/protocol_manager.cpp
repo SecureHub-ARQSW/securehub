@@ -68,7 +68,7 @@ void shub::ProtocolManager::ConnectToMqtt(std::string const& mqtt_broker, int mq
     }
 }
 
-std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value, std::string const& unit="") {
+std::string shub::ProtocolManager::SerializeJson(std::string const& variable_name, double value, std::string const& unit) {
     StaticJsonDocument<200> doc;
     doc["variable"] = variable_name;
     doc["value"] = value;
