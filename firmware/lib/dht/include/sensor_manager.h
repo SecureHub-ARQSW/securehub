@@ -8,26 +8,26 @@
 
 namespace shub {
 
-    constexpr int kPeriodSendTemperature = 1000 * 60; // 1 minute 
+constexpr int kPeriodSendTemperature = 1000 * 60; // 1 minute 
 
-    using TemperatureSensor = SimpleDHT22;
+using TemperatureSensor = SimpleDHT22;
 
-    class SensorManager {
+class SensorManager {
 
-    public:
-        SensorManager(TemperatureSensor&& sensor);
-        virtual ~SensorManager() = default;
+public:
+  SensorManager(TemperatureSensor&& sensor);
+  virtual ~SensorManager() = default;
 
-        float GetTemperature();
+  float GetTemperature();
 
-        void ProcessTemperature(unsigned long& previous, unsigned long& current);
+  void ProcessTemperature(unsigned long& previous, unsigned long& current);
 
-    private:
-        TemperatureSensor sensor_;
-        float temperature_ = 0;
-        double total_temperature_ = 0;
-        int samples_ = 0;
-    };
+private:
+  TemperatureSensor sensor_;
+  float temperature_ = 0;
+  double total_temperature_ = 0;
+  int samples_ = 0;
+};
 
 } // namespace shub
 
