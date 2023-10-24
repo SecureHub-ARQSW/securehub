@@ -23,7 +23,9 @@ shub::ProtocolManager protocol_manager("Lost", "samuel1234");
 // shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 void KeypadHandleInput(uint8_t col);
 
-unsigned long previousTime = 0;
+unsigned long temperature_time = 0;
+unsigned long previous_time = 0;
+
 
 void setup() {
   Serial.begin(115200);
@@ -89,16 +91,16 @@ void loop() {
     }
   }
 
-  sensor_manager.ProcessTemperature(previousTime, current_time);
+  sensor_manager.ProcessTemperature(previous_time, current_time);
 
   protocol_manager.VerifyWifiConnection();
   
   protocol_manager.ClientLoop();
 
-  if(current_time - previousTime >= shub::kPeriodSendTemperature){
+  if(current_time - temperature_time >= shub::kPeriodSendTemperature){
     protocol_manager.PublishMessage("info/temperature", protocol_manager.SerializeJson("temperature", sensor_manager.GetTemperature(), "ºC"));
 
-    previousTime = current_time;
+    temperature_time = current_time;
   }
 
 
