@@ -11,16 +11,19 @@
 #include "protocol_manager.h"
 #include "buzzer_manager.h"
 #include "display_manager.h"
-
+#include "sensor_manager.h"
 
 shub::Keypad keypad(shub::MatrixKeypad({13, 12, 14, 27}, {26, 25, 33, 32}));
 shub::InputProcessor input_processor(6);
 shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
+shub::SensorManager sensor_manager(shub::SensorTemperature(4));
 shub::ProtocolManager protocol_manager("Lost", "samuel1234");
 // shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 void KeypadHandleInput(uint8_t col);
+
+unsigned long previousTime = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -49,6 +52,8 @@ void setup() {
 }
 
 void loop() {
+  unsigned long current_time = millis();
+
   buzzer_manager.PlayLoadedSequence();
 
   if(input_processor.IsPending()) {
@@ -84,10 +89,20 @@ void loop() {
     }
   }
 
+  sensor_manager.ProcessTemperature(previousTime, current_time);
+
   protocol_manager.VerifyWifiConnection();
+  
   protocol_manager.ClientLoop();
-  delay(1000);
-  protocol_manager.PublishMessage("info/temperature", protocol_manager.SerializeJson("temperature", 25.6, "ºC"));
+
+  if(current_time - previousTime >= shub::kPeriodSendTemperature){
+    protocol_manager.PublishMessage("info/temperature", protocol_manager.SerializeJson("temperature", sensor_manager.GetTemperature(), "ºC"));
+
+    previousTime = current_time;
+  }
+
+
+
   protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 }
 
