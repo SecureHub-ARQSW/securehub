@@ -4,7 +4,7 @@
 
 #include "sensor_manager.h"
 
-shub::SensorManager::SensorManager(SensorTemperature&& sensor) : sensor_(sensor) {
+shub::SensorManager::SensorManager(TemperatureSensor&& sensor) : sensor_(sensor) {
 }
 
 void shub::SensorManager::ProcessTemperature(unsigned long& previous, unsigned long& current) {
