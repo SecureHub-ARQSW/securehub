@@ -31,7 +31,13 @@ function Routes() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="Monitor" component={MonitorScreen} />
+      <Stack.Screen
+        name="Monitor"
+        component={MonitorScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 }
