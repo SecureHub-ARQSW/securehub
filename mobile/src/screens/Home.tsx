@@ -15,7 +15,7 @@ function HomeScreen({navigation}: HomeScreenProps): JSX.Element {
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={styles.buttonBlock}
-          onPress={() => navigation.push('State')}>
+          onPress={() => navigation.push('Status')}>
           <Icon name="eye" size={24} color="#fff" />
           <Text style={styles.buttonText}>VISUALIZAR ESTADO</Text>
         </TouchableOpacity>
