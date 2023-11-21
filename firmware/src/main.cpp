@@ -12,6 +12,7 @@
 #include "buzzer_manager.h"
 #include "display_manager.h"
 #include "sensor_manager.h"
+#include "servo_manager.h"
 
 shub::Keypad keypad(shub::MatrixKeypad({13, 12, 14, 27}, {26, 25, 33, 32}));
 shub::InputProcessor input_processor(6);
@@ -19,8 +20,9 @@ shub::PasswordManager password_manager({"12345", "54321"});
 shub::BuzzerManager buzzer_manager(shub::Buzzer(19));
 shub::DisplayManager display_manager(shub::Display(0x3F, 16, 2));
 shub::SensorManager sensor_manager(shub::TemperatureSensor(4));
-shub::ProtocolManager protocol_manager("Lost", "samuel1234");
-// shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
+// shub::ProtocolManager protocol_manager("Lost", "samuel1234");
+shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
+shub::ServoManager servo_manager(15);
 void KeypadHandleInput(uint8_t col);
 
 unsigned long temperature_time = 0;
@@ -103,7 +105,10 @@ void loop() {
     temperature_time = current_time;
   }
 
-
+  for (int i = 0; i < 180; i+=20) {
+    servo_manager.SetAngle(i);
+    delay(150);
+  }
 
   protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 }
