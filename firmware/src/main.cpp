@@ -23,11 +23,12 @@ shub::SensorManager sensor_manager(shub::TemperatureSensor(4));
 // shub::ProtocolManager protocol_manager("Lost", "samuel1234");
 shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 shub::ServoManager servo_manager(15);
+
 void KeypadHandleInput(uint8_t col);
 
 unsigned long temperature_time = 0;
+unsigned long lock_time = 0;
 unsigned long previous_time = 0;
-
 
 void setup() {
   Serial.begin(115200);
@@ -37,6 +38,7 @@ void setup() {
   protocol_manager.ConnectToWifi();
   protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "0b85a2cd-8762-4c97-a960-35c34f7bb9c0", "ESP32-SHUB");
   Serial.printf("Payload: \n%s\n", protocol_manager.SerializeJson("temperature", 25.6, "ºC").c_str());
+  protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
     KeypadHandleInput(0);
@@ -58,7 +60,7 @@ void setup() {
 void loop() {
   unsigned long current_time = millis();
 
-  buzzer_manager.PlayLoadedSequence();
+  // buzzer_manager.PlayLoadedSequence();
 
   if(input_processor.IsPending()) {
 
@@ -83,11 +85,17 @@ void loop() {
       std::string password_input = input_processor.ExtractData();
       bool is_correct_password = password_manager.TestPassword(password_input);
       if(is_correct_password) {
-        buzzer_manager.PlaySuccessSequence();
+        // buzzer_manager.PlaySuccessSequence();
         display_manager.ShowSuccessMessage();
+        protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 0));
+        servo_manager.SetAngle(180);
+        lock_time = current_time;
       } else {
-        buzzer_manager.PlayFailureSequence();
+        // buzzer_manager.PlayFailureSequence();
         display_manager.ShowFailureMessage();
+        protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
+        servo_manager.SetAngle(0);
+        lock_time = current_time;
       }
       display_manager.ClearAsterisks();
     }
@@ -105,19 +113,17 @@ void loop() {
     temperature_time = current_time;
   }
 
-  for (int i = 0; i < 180; i+=20) {
-    servo_manager.SetAngle(i);
-    delay(150);
+  if(current_time - lock_time >= 4000) {
+    protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
+    lock_time = current_time;
   }
-
-  protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 }
 
 void KeypadHandleInput(uint8_t col) {
   char pressed_key = keypad.CheckPressedButton(col);
   if(shub::Keypad::IsKeyValid(pressed_key)) {
     if(pressed_key != shub::FunctionKey::kDone) {
-      buzzer_manager.LoadInputSequence();
+      // buzzer_manager.LoadInputSequence();
     }
     input_processor.PushData(pressed_key);
   }
