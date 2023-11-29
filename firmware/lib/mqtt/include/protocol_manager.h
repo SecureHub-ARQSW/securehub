@@ -24,6 +24,8 @@ class ProtocolManager {
     std::string const& device_name);
   std::string SerializeJson(std::string const& variable_name, double value, std::string const& unit="");
   void PublishMessage(std::string const& topic, std::string const& payload);
+  void Subscribe(std::string const& topic);
+  void SetCallback(std::function<void(char*, byte*, unsigned int)> callback);
   void ClientLoop() { mqtt_client_.loop(); };
 
   std::string GetSsid() const { return ssid_; };
@@ -36,7 +38,7 @@ class ProtocolManager {
   std::string ssid_;
   std::string password_;
 
- private:
+ public:
   WiFiClient wifi_client_;
   PubSubClient mqtt_client_;
 

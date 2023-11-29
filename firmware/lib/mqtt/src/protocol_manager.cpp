@@ -87,3 +87,24 @@ void shub::ProtocolManager::PublishMessage(std::string const& topic, std::string
         Serial.printf("MQTT   : Failed to publish message to topic %s\n", topic.c_str());
     }
 }
+
+
+void shub::ProtocolManager::Subscribe(std::string const& topic) {
+    mqtt_client_.subscribe(topic.c_str());
+}
+
+void shub::ProtocolManager::SetCallback(std::function<void(char*, byte*, unsigned int)> callback) {
+    mqtt_client_.setCallback(callback);
+}
+
+// void shub::ProtocolManager::CallbackPassword(char *topic, byte *payload, unsigned int length) {
+//   StaticJsonDocument<200> doc;
+//   DeserializationError error = deserializeJson(doc, payload, length);
+//   if (error) {
+//     Serial.print(F("deserializeJson() failed: "));
+//     Serial.println(error.c_str());
+//     return;
+//   }
+//   std::cout << doc["variable"] << std::endl;
+//   std::cout << doc["value"] << std::endl;
+// }

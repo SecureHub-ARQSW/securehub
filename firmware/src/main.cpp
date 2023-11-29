@@ -2,7 +2,7 @@
 // All rights reserved
 
 #include <queue>
-
+#include <iostream>
 #include <Arduino.h>
 
 #include "input_processor.h"
@@ -24,6 +24,7 @@ shub::SensorManager sensor_manager(shub::TemperatureSensor(4));
 shub::ProtocolManager protocol_manager("MOB-JOAO VICTOR", "9846969400");
 shub::ServoManager servo_manager(15);
 void KeypadHandleInput(uint8_t col);
+void CallbackPassword(char *topic, byte *payload, unsigned int length);
 
 unsigned long temperature_time = 0;
 unsigned long previous_time = 0;
@@ -36,6 +37,20 @@ void setup() {
 
   protocol_manager.ConnectToWifi();
   protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "0b85a2cd-8762-4c97-a960-35c34f7bb9c0", "ESP32-SHUB");
+  protocol_manager.SetCallback(CallbackPassword);
+  // protocol_manager.SetCallback("info/password", CallbackPassword);
+  // protocol_manager.SetCallback("info/password", [](char *topic, byte *payload, unsigned int length) {
+  //   StaticJsonDocument<200> doc;
+  //   DeserializationError error = deserializeJson(doc, payload, length);
+  //   if (error) {
+  //     Serial.print(F("deserializeJson() failed: "));
+  //     Serial.println(error.c_str());
+  //     return;
+  //   }
+  //   std::cout << doc["variable"] << std::endl;
+  //   std::cout << doc["value"] << std::endl;
+  // });
+  protocol_manager.Subscribe("info/temperature");
   Serial.printf("Payload: \n%s\n", protocol_manager.SerializeJson("temperature", 25.6, "ºC").c_str());
 
   attachInterrupt(digitalPinToInterrupt(keypad.GetColumm(0)), []() {
@@ -104,13 +119,16 @@ void loop() {
 
     temperature_time = current_time;
   }
+  
 
-  for (int i = 0; i < 180; i+=20) {
-    servo_manager.SetAngle(i);
-    delay(150);
-  }
+  // protocol_manager.ConnectToMqtt("mqtt.tago.io", 1883, "Default", "0b85a2cd-8762-4c97-a960-35c34f7bb9c0", "ESP32-SHUB");
+  // protocol_manager.Subscribe("info/lock");
+  // for (int i = 0; i < 180; i+=20) {
+  //   servo_manager.SetAngle(i);
+  //   delay(150);
+  // }
 
-  protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
+  // protocol_manager.PublishMessage("info/lock", protocol_manager.SerializeJson("lock", 1));
 }
 
 void KeypadHandleInput(uint8_t col) {
@@ -121,4 +139,15 @@ void KeypadHandleInput(uint8_t col) {
     }
     input_processor.PushData(pressed_key);
   }
+}
+
+void CallbackPassword(char *topic, byte *payload, unsigned int length) {
+  Serial.print("Message arrived in topic: ");
+  Serial.println(topic);
+  Serial.print("Message:");
+  for(int i = 0; i < length; i++) {
+      Serial.print((char)payload[i]);
+  }
+  Serial.println();
+  Serial.println("-----------------------");
 }
