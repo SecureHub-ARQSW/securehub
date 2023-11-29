@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StyleSheet, View, Text, FlatList, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {tagoIOServices} from '../services/tagoio';
 
 interface DateTimeItem {
   id: string;
@@ -12,6 +13,36 @@ interface DateTimeItem {
 interface HistoryScreenProps extends NativeStackScreenProps<any, 'History'> {}
 
 function HistoryScreen({navigation}: HistoryScreenProps): JSX.Element {
+  const [historyOfAccess, setHistoryOfAccess] = useState<DateTimeItem[]>([]);
+
+  useEffect(() => {
+    async function getData() {
+      const data = await tagoIOServices().getData({
+        variables: 'lock',
+        qty: 10,
+      });
+
+      if (!data) {
+        return;
+      }
+
+      const result = data.result.map((item: any) => ({
+        id: item.id,
+        // formatted value 26/09/2023 - 16:00
+        dateTime: new Date(item.time).toLocaleString('pt-BR'),
+        status: item.value !== '2' ? 'success' : 'failure',
+      }));
+
+      setHistoryOfAccess(result);
+    }
+
+    getData();
+
+    /* setInterval(() => {
+      getData();
+    }, 1000); */
+  }, []);
+
   const mock: DateTimeItem[] = [
     {
       id: '1',
@@ -43,7 +74,7 @@ function HistoryScreen({navigation}: HistoryScreenProps): JSX.Element {
       </Text>
       <FlatList
         style={styles.scrollViewContainer}
-        data={mock}
+        data={historyOfAccess}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
           <View style={styles[item.status]}>

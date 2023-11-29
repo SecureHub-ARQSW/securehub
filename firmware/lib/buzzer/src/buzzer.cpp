@@ -16,7 +16,10 @@ shub::Buzzer::Buzzer(pin_t buzzer) :
 }
 
 void shub::Buzzer::Play(uint32_t frequency, uint32_t duration) const {
+  setToneChannel(10);
   tone(buzzer_, frequency, duration);
+  // delay(duration);
+  // noTone(buzzer_);
 }
 
 void shub::Buzzer::Play(BuzzerConfig const& config) const {

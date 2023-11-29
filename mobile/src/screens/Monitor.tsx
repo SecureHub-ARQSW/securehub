@@ -1,11 +1,35 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {tagoIOServices} from '../services/tagoio';
 
 interface MonitorScreenProps extends NativeStackScreenProps<any, 'Monitor'> {}
 
 function MonitorScreen({navigation}: MonitorScreenProps): JSX.Element {
+  const [temperatureValue, setTemperatureValue] = useState(0);
+
+  useEffect(() => {
+    async function getData() {
+      const data = await tagoIOServices().getData({
+        variables: 'temperature',
+        qty: 1,
+      });
+
+      if (!data) {
+        return;
+      }
+
+      const result = data.result[0].value;
+
+      setTemperatureValue(result);
+    }
+
+    setInterval(() => {
+      getData();
+    }, 1000);
+  }, []);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -20,7 +44,9 @@ function MonitorScreen({navigation}: MonitorScreenProps): JSX.Element {
       <View style={styles.boxTemperature}>
         <Icon name="thermometer" size={48} color="#fff" />
         <Text style={styles.textTemperature}>Temperatura atual:</Text>
-        <Text style={styles.valueTemperature}>20°C</Text>
+        <Text style={styles.valueTemperature}>
+          {temperatureValue.toFixed(0)} °C
+        </Text>
       </View>
     </View>
   );
